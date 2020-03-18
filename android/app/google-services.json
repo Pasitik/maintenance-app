@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "497509473975",
+    "firebase_url": "https://road-d0f9e.firebaseio.com",
+    "project_id": "road-d0f9e",
+    "storage_bucket": "road-d0f9e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:497509473975:android:126e287a0d91567293f732",
+        "android_client_info": {
+          "package_name": "com.example.maintenance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "497509473975-3jng40i1u6eknd1ub734jig742jopcoi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACOAnXgzro4zrFoiI_TEiLAnCcUvuxLgk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "497509473975-3jng40i1u6eknd1ub734jig742jopcoi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
