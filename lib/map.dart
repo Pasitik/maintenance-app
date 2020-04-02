@@ -58,18 +58,20 @@ class FireMapState extends State<FireMap> {
 
   build(context) {
     // widgets go here
-    return Stack(
-        children: [
-          GoogleMap(
-              initialCameraPosition: CameraPosition(target: LatLng(24.150, -110.32), zoom: 10),
-              onMapCreated: _onMapCreated,
-              myLocationEnabled: true, // Add little blue dot for device location, requires permission from user
-              mapType: _currentMapType,
-              //trackCameraPosition: true
-            onCameraMove:  _updateCameraPosition,
+    return Scaffold(
+          body: Stack(
+          children: [
+            GoogleMap(
+                initialCameraPosition: CameraPosition(target: LatLng(24.150, -110.32), zoom: 10),
+                onMapCreated: _onMapCreated,
+                myLocationEnabled: true, // Add little blue dot for device location, requires permission from user
+                mapType: _currentMapType,
+                //trackCameraPosition: true
+              onCameraMove:  _updateCameraPosition,
 
-          ),
-        ]
+            ),
+          ]
+      ),
     );
   }
 
