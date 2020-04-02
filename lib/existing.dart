@@ -17,6 +17,7 @@ class Existing extends StatefulWidget {
 }
 
 class ExistingState extends State<Existing> {
+  
   @override
   Stream<dynamic> query;
   Firestore firestore = Firestore.instance;
@@ -28,89 +29,40 @@ class ExistingState extends State<Existing> {
     return qn.documents;
   }*/
 
-  func Func=new func();
-
-
-
   Widget build(BuildContext context) {
-    return Container(
-        child: Center(
-            child: ListView.builder(
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                itemCount: 1,
-                itemBuilder: (_, index) {
-                  return Center(
-                      child: Card(
-                          color: Colors.greenAccent,
+    return StreamBuilder(
+      stream: Firestore.instance.collection('Robbery').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) return Center(
+          child: CircularProgressIndicator(),
+        );
+        return ListView(
+          children: snapshot.data.documents.map( (document) {
+            return Card(
                           child: ListTile(
-                            title: new Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                SizedBox(height: 400.0),
-                                new InkWell(
-                                    splashColor: Colors.red,
-                                    onTap: () {
-                                        Func.type = "Robbery";
-
-                                      //Func.getReports("Robbery");
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>Stuff()),
-                                      );
-                                      //Func.getReports("Robbery");
-                                      //print("I was tapped");
-                                    },
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(15.0),
-                                      ),
-                                      child: Text(
-                                        'Robbery',
-                                        textScaleFactor: 2.0,
-                                      ),
-                                    )),
-                                new InkWell(
-                                    splashColor: Colors.red,
-                                    onTap: () {
-                                      Func.getReports("");
-                                      print("I was tapped");
-                                    },
-                                    child: Card(
-                                      shape: BeveledRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                      ),
-                                      child: Text(
-                                        'Card with Beveled border',
-                                        textScaleFactor: 2.0,
-                                      ),
-                                    )),
-                                new InkWell(
-                                    splashColor: Colors.red,
-                                    onTap: () {
-                                      print("I was tapped");
-                                    },
-                                    child: Card(
-                                      shape: StadiumBorder(
-                                        side: BorderSide(
-                                          color: Colors.black,
-                                          width: 2.0,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'Card with Beveled border',
-                                        textScaleFactor: 2.0,
-                                      ),
-                                    )),
-                                new Card(),
-                                new Card()
-                              ],
-                            ),
-                          )));
-                })));
+                title: Text(document['info']),
+                subtitle: Text(document['info']),
+                trailing: Icon(Icons.my_location),
+                onTap: () {
+                  Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => FireMap()));
+                },
+              ),
+            );
+          } ).toList(),
+        );
+      });
   }
+
+  // read data from cloud firestore
+  // void getData() async {
+  //   await databaseReference
+  //     .collection("Robbery")
+  //     .getDocuments()
+  //     .then((QuerySnapshot snapshot) {
+  //       snapshot.documents.forEach((f) => print(f.data));
+  //     });
+  //     print("Hello");
+  // }
+
 }
