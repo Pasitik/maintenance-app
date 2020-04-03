@@ -18,74 +18,84 @@ class FireMap extends StatefulWidget {
 
 class FireMapState extends State<FireMap> {
   @override
-  static final CameraPosition _kInitialPosition = const CameraPosition(
-    target: LatLng(24.150, -110.32),
-    zoom: 10,
-  );
-  GoogleMapController mapController;
-  CameraPosition _position = _kInitialPosition;
-  MapType _currentMapType = MapType.normal;
+  Widget build(BuildContext context) {
+    //To Require Permission
 
-
-  final Firestore _database = Firestore.instance;
-  Completer<GoogleMapController> _controller = Completer();
-  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
-
-
-//marker
-  void initMarker(lugar, lugaresid) {
-    var markerIdVal = lugaresid;
-    final MarkerId markerId = MarkerId(markerIdVal);
-
-    // creating a new MARKER
-    final Marker marker = Marker(
-      markerId: markerId,
-      position: LatLng(lugar['Latitud'], lugar['Longitud']),
-      infoWindow: InfoWindow(title: lugar['Lugar'], snippet: lugar['tipo']),
+    return MaterialApp(
+      title: 'Flutter Google Maps Demo',
+      home: MapSample(),
     );
+  }
+}
 
-    setState(() {
-      // adding a new marker to map
-      markers[markerId] = marker;
+class MapSample extends StatefulWidget {
+  @override
+  State<MapSample> createState() => MapSampleState();
+}
+
+class MapSampleState extends State<MapSample> {
+  Map<PolylineId, Polyline> _mapPolylines = {};
+  int _polylineIdCounter = 1;
+
+  static double latitude_current = 31.9414246;
+  static double longitude_current = 35.8880857;
+
+  void _GetDeviceLocation() async {
+    var location = new Location();
+    location.changeSettings(
+      accuracy: LocationAccuracy.HIGH,
+      distanceFilter: 0,
+      interval: 100,
+    );
+    location.onLocationChanged().listen((LocationData currentLocation) {
+      latitude_current = currentLocation.latitude;
+      longitude_current = currentLocation.longitude;
+      _goToTheLake();
     });
   }
 
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
 
 
-  build(context) {
-    // widgets go here
-    return Scaffold(
-          body: Stack(
-          children: [
-            GoogleMap(
-                initialCameraPosition: CameraPosition(target: LatLng(24.150, -110.32), zoom: 10),
-                onMapCreated: _onMapCreated,
-                myLocationEnabled: true, // Add little blue dot for device location, requires permission from user
-                mapType: _currentMapType,
-                //trackCameraPosition: true
-              onCameraMove:  _updateCameraPosition,
+  Completer<GoogleMapController> _controller = Completer();
 
-            ),
-          ]
+  static final CameraPosition _kLake = CameraPosition(
+      bearing: 60.8334901395799,
+      target: LatLng(latitude_current, longitude_current),
+      tilt: 80.440717697143555,
+      zoom: 18.151926040649414);
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: AppBar(
+        title: Text("Maps"),
+        actions: <Widget>[IconButton(icon: Icon(Icons.add), onPressed: _GetDeviceLocation)],
+      ),
+      body: GoogleMap(
+        mapType: MapType.normal,
+        initialCameraPosition: CameraPosition(
+          target: LatLng(latitude_current, longitude_current),
+          zoom: 14.4746,
+        ),
+        onMapCreated: (GoogleMapController controller) async {
+          _GetDeviceLocation();
+          _controller.complete(controller);
+        },
+        myLocationEnabled: true,
+        polylines: Set<Polyline>.of(_mapPolylines.values),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _goToTheLake,
+        label: Text('Drive Mode'),
+        icon: Icon(Icons.directions_boat),
       ),
     );
   }
 
-  void _updateCameraPosition(CameraPosition position) {
-    setState(() {
-      _position = position;
-    });
-  }
+  Future<void> _goToTheLake() async {
+    _GetDeviceLocation();
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
 
-
-  void _onMapCreated(GoogleMapController controller) {
-    setState(() {
-      mapController = controller;
-    });
   }
 }
-
