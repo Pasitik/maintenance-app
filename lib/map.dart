@@ -1,101 +1,158 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rxdart/rxdart.dart';
-import 'dart:async';
 import 'package:location/location.dart';
-import 'package:flutter/services.dart';
-
-
+import 'userLocation.dart';
+import 'Nav.dart';
 class FireMap extends StatefulWidget {
   @override
   State createState() => FireMapState();
+  //final name;
+  //FireMap(this.name);
 }
-
 
 class FireMapState extends State<FireMap> {
-  @override
-  Widget build(BuildContext context) {
-    //To Require Permission
+  String _modeOfTransport = "";
+  LocationData _currentLocation;
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  Marker _marker;
 
-    return MaterialApp(
-      title: 'Flutter Google Maps Demo',
-      home: MapSample(),
-    );
-  }
-}
-
-class MapSample extends StatefulWidget {
-  @override
-  State<MapSample> createState() => MapSampleState();
-}
-
-class MapSampleState extends State<MapSample> {
-  Map<PolylineId, Polyline> _mapPolylines = {};
-  int _polylineIdCounter = 1;
-
-  static double latitude_current = 31.9414246;
-  static double longitude_current = 35.8880857;
-
-  void _GetDeviceLocation() async {
-    var location = new Location();
-    location.changeSettings(
-      accuracy: LocationAccuracy.HIGH,
-      distanceFilter: 0,
-      interval: 100,
-    );
-    location.onLocationChanged().listen((LocationData currentLocation) {
-      latitude_current = currentLocation.latitude;
-      longitude_current = currentLocation.longitude;
-      _goToTheLake();
-    });
-  }
-
-
-
-  Completer<GoogleMapController> _controller = Completer();
-
-  static final CameraPosition _kLake = CameraPosition(
-      bearing: 60.8334901395799,
-      target: LatLng(latitude_current, longitude_current),
-      tilt: 80.440717697143555,
-      zoom: 18.151926040649414);
+  final databaseReference = Firestore.instance;
+  var query=Firestore.instance.collection('Accidents');
+  bool _isLoading = false;
+  Map<String, dynamic> forShow;
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: AppBar(
-        title: Text("Maps"),
-        actions: <Widget>[IconButton(icon: Icon(Icons.add), onPressed: _GetDeviceLocation)],
-      ),
-      body: GoogleMap(
-        mapType: MapType.normal,
-        initialCameraPosition: CameraPosition(
-          target: LatLng(latitude_current, longitude_current),
-          zoom: 14.4746,
+    if (!_isLoading) {
+      return new Scaffold(
+        floatingActionButton: new RaisedButton(
+          elevation: 14.0,
+          color: Colors.blue,
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          child: new Container(
+            child: new Text(
+              "Start Navigation",
+              style: new TextStyle(
+                color: Colors.white,
+                letterSpacing: 2.0,
+              ),
+            ),
+            padding: EdgeInsets.all(10.0),
+          ),
+          onPressed: () async {
+            SimpleDialog a = new SimpleDialog(
+              contentPadding: EdgeInsets.all(20.0),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0)),
+              children: <Widget>[
+                new Container(
+                  margin: EdgeInsets.symmetric(vertical: 10.0),
+                  child: new Center(
+                    child: new Text("Please select your mode of transport"),
+                  ),
+                ),
+                new Container(
+                  margin: EdgeInsets.symmetric(horizontal: 20.0),
+                  child: new RaisedButton(
+                    color: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _modeOfTransport = "walking";
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: new Text(
+                      "Walking",
+                      style: new TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+                new Container(
+                  margin: EdgeInsets.symmetric(horizontal: 20.0),
+                  child: new RaisedButton(
+                    color: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _modeOfTransport = "driving";
+                      });
+                      Navigator.pop(context);
+                    },
+                    child: new Text(
+                      "Driving",
+                      style: new TextStyle(color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
+            );
+            await showDialog(
+                context: context,
+                builder: ((c) {
+                  return a;
+                }));
+            // setState(() {
+            //   _isLoading = true;
+            // });
+            Nav n;
+            _currentLocation = await getUserLoc();
+            if (_currentLocation == null) {
+              n = new Nav(5.6127806, -0.2518546, forShow['loc']['lat'],
+                  forShow['loc']['long'], _modeOfTransport);
+            } else {
+    n = new Nav(
+                  _currentLocation.latitude,
+                  _currentLocation.longitude,
+                  forShow['loc']['lat'],
+                  forShow['loc']['long'],
+                  _modeOfTransport);
+            }
+
+            await n.startNav(() {
+              // setState(() {
+              //   _isLoading = false;
+              // });
+            });
+          },
         ),
-        onMapCreated: (GoogleMapController controller) async {
-          _GetDeviceLocation();
-          _controller.complete(controller);
-        },
-        myLocationEnabled: true,
-        polylines: Set<Polyline>.of(_mapPolylines.values),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _goToTheLake,
-        label: Text('Drive Mode'),
-        icon: Icon(Icons.directions_boat),
-      ),
-    );
-  }
-
-  Future<void> _goToTheLake() async {
-    _GetDeviceLocation();
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
-
+        body: new GoogleMap(
+            mapToolbarEnabled: true,
+            trafficEnabled: true,
+            padding:
+            EdgeInsets.only(top: MediaQuery.of(context).size.height / 1.4),
+            myLocationEnabled: true,
+            onMapCreated: (con) async {
+              _marker = new Marker(
+                markerId: MarkerId("1"),
+                draggable: false,
+                position: LatLng(forShow['loc']['lat'], forShow['loc']['long']),
+                infoWindow: InfoWindow(title: "Problem Location"),//widget.name),
+              );
+              setState(() {
+                markers[MarkerId("1")] = _marker;
+              });
+            },
+            myLocationButtonEnabled: true,
+            compassEnabled: true,
+            markers: Set<Marker>.of(markers.values),
+            initialCameraPosition: new CameraPosition(
+                zoom: 14.0,
+                target: LatLng(forShow['loc']['lat'], forShow['loc']['long']))),
+      );
+    } else {
+      return new Container(
+        color: Colors.white,
+        child: new Center(
+          child: new CircularProgressIndicator(),
+        ),
+      );
+    }
   }
 }

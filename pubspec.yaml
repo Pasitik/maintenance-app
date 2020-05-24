@@ -30,6 +30,7 @@ dependencies:
   firebase_core: ^0.4.3+2
   cloud_firestore: ^0.13.0+1
   loading_animations: ^1.0.0
+  flutter_mapbox_navigation: 0.0.7
   rxdart: ^0.23.1
 
 

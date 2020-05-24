@@ -1,16 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'dashboard.dart';
-import 'map.dart';
+import 'repairs.dart';
+import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rxdart/rxdart.dart';
+import 'dart:async';
 import 'package:location/location.dart';
 import 'package:flutter/services.dart';
+
 class Repairs extends StatefulWidget {
   @override
   _RepairsState createState() => _RepairsState();
 }
 
 class _RepairsState extends State<Repairs> {
+  GoogleMapController mapController;
+  Location location = new Location();
+
+  Firestore firestore = Firestore.instance;
+  Geoflutterfire geo = Geoflutterfire();
+
+  // Stateful Data
+  //BehaviorSubject<double> radius = BehaviorSubject(seedValue: 100.0);
+  Stream<dynamic> query;
+
+  // Subscription
+  StreamSubscription subscription;
+
+
   Material MyItems(IconData icon, String heading, int color, String page) {
     return Material(
       color: Colors.black45,
@@ -78,6 +97,17 @@ class _RepairsState extends State<Repairs> {
   }
 
 
+  LocationData currentLocation;
+
+
+
+
+  //submit location to db
+
+
+
+
+  final databaseReference = Firestore.instance;
   @override
   Widget build(BuildContext context) {
     //appbar
@@ -97,163 +127,65 @@ class _RepairsState extends State<Repairs> {
         children: <Widget>[
           InkWell(
             child:MyItems(Icons.healing, "Traffic lights", 0xffed622b, "/health"),
-            onTap: (){
-              //YYDialog YYDialogDemo(BuildContext context) {
-                return YYDialog().build(context)
-                  ..width = 220
-                  ..height = 300
-                  ..barrierColor = Colors.black.withOpacity(.3)
-                  ..animatedFunc = (child, animation) {
-                    return ScaleTransition(
-                      child: child,
-                      scale: Tween(begin: 0.0, end: 1.0).animate(animation),
-                    );
-                  }
-                  ..widget(
-                    Padding(
-                      padding: EdgeInsets.all(0.0),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child:  Center(
-                          child: new Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              new Text( "By selcting this option you will be reporting faulty trafic lights in your cuurent location. We will like to inform that your current location will be submitted with you report.  "
-                                  "Tap submit if you will like to proceed with your report."),
-                              new RaisedButton(onPressed: _addGeoPoint(),
-                                  child: Text("Submit")),
-                            ],
-                          ),
-                        )
-                      ),
-                    ),
-                  )
-                  ..show();
+              onTap: () {
+                Future<DocumentReference> addGeoPoint() async{
+                  var pos = await location.getLocation();
+                  GeoFirePoint point= geo.point(latitude: pos.latitude, longitude: pos.longitude);
+                  return databaseReference.collection("Traffic").add({
+                    "info":'Faulty traffic lights',
+                    "location":point.data,
 
-              //}
-            },
-          ),
+                  });
+                }
+                addGeoPoint();
+
+              }),
+
           InkWell(
             child: MyItems(Icons.directions_bus, "Street lights", 0xff26cb3c, "/roads"),
-            onTap: (){
-              return YYDialog().build(context)
-                ..width = 220
-                ..height = 300
-                ..barrierColor = Colors.black.withOpacity(.3)
-                ..animatedFunc = (child, animation) {
-                  return ScaleTransition(
-                    child: child,
-                    scale: Tween(begin: 0.0, end: 1.0).animate(animation),
-                  );
-                }
-                ..widget(
-                  Padding(
-                    padding: EdgeInsets.all(0.0),
-                    child: Align(
-                        alignment: Alignment.centerLeft,
-                        child:  Center(
-                          child: new Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              new Text( "By selcting this option you will be reporting faulty trafic lights in your cuurent location. We will like to inform that your current location will be submitted with you report.  "
-                                  "Tap submit if you will like to proceed with your report."),
-                              new RaisedButton(onPressed: _addGeoPoint(),
-                                  child: Text("Submit")),
-                            ],
-                          ),
-                        /*  child:Text(
-                            "By selcting this option you will be reporting faulty trafic lights in your cuurent location. We will like to inform that your current location will be submitted with you report.  "
-                                "Tap submit if you will like to proceed with your report.",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w100,
-                            ),
-                          ),*/
-                        )
-                    ),
-                  ),
+              onTap: () {
+                Future<DocumentReference> addGeoPoint() async{
+                  var pos = await location.getLocation();
+                  GeoFirePoint point= geo.point(latitude: pos.latitude, longitude: pos.longitude);
+                  return databaseReference.collection("Street_lights").add({
+                    "info":'Faulty Steet lights',
+                    "location":point.data,
 
-                )
-                ..show();
-            },
-          ),
+                  });
+                }
+                addGeoPoint();
+
+              }),
           InkWell(
             child: MyItems(Icons.book, "Potholes", 0xffff3266, "/edu"),
-            onTap: (){
-              return YYDialog().build(context)
-                ..width = 220
-                ..height = 300
-                ..barrierColor = Colors.black.withOpacity(.3)
-                ..animatedFunc = (child, animation) {
-                  return ScaleTransition(
-                    child: child,
-                    scale: Tween(begin: 0.0, end: 1.0).animate(animation),
-                  );
+              onTap: () {
+                Future<DocumentReference> addGeoPoint() async{
+                  var pos = await location.getLocation();
+                  GeoFirePoint point= geo.point(latitude: pos.latitude, longitude: pos.longitude);
+                  return databaseReference.collection("Potholes").add({
+                    "info":'Potholes',
+                    "location":point.data,
+
+                  });
                 }
-                ..widget(
-                  Padding(
-                    padding: EdgeInsets.all(0.0),
-                    child: Align(
-                        alignment: Alignment.centerLeft,
-                        child:  Center(
-                          child: new Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              new Text( "By selcting this option you will be reporting Potholes in your cuurent location. We will like to inform that your current location will be submitted with you report.  "
-                                  "Tap submit if you will like to proceed with your report."),
-                              new RaisedButton(onPressed: _addGeoPoint(),
-                                  child: Text("Submit")),
-                            ],
-                          ),
-                        )
-                    ),
-                  ),
-                )
-                ..show();
-            },
-          ),
-          //InkWell(
-           // child: MyItems(Icons.cloud, "Robbery", 0xfff4c83f, "/sec"),
-           // onTap: (){
-              //print("robbery");
-            //},
-         // ),
+                addGeoPoint();
+
+              }),
           InkWell(
             child: MyItems(Icons.healing, "Blockage", 0xff622f74, "/san"),
-            onTap: (){
-              return YYDialog().build(context)
-                ..width = 220
-                ..height = 300
-                ..barrierColor = Colors.black.withOpacity(.3)
-                ..animatedFunc = (child, animation) {
-                  return ScaleTransition(
-                    child: child,
-                    scale: Tween(begin: 0.0, end: 1.0).animate(animation),
-                  );
+              onTap: () {
+                Future<DocumentReference> addGeoPoint() async{
+                  var pos = await location.getLocation();
+                  GeoFirePoint point= geo.point(latitude: pos.latitude, longitude: pos.longitude);
+                  return databaseReference.collection("Blockage").add({
+                    "info":'There is something blocking this road',
+                    "location":point.data,
+
+                  });
                 }
-                ..widget(
-                  Padding(
-                    padding: EdgeInsets.all(0.0),
-                    child: Align(
-                        alignment: Alignment.centerLeft,
-                        child:  Center(
-                          child: new Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              new Text( "By selcting this option you will be reporting Road blockages in your cuurent location. We will like to inform that your current location will be submitted with you report.  "
-                                  "Tap submit if you will like to proceed with your report."),
-                              new RaisedButton(onPressed: _addGeoPoint(),
-                                  child: Text("Submit")),
-                            ],
-                          ),
-                        )
-                    ),
-                  ),
-                )
-                ..show();
-            },
-          ),
+                addGeoPoint();
+
+              }),
 
           // MyItems(Icons.directions_railway, "railways", 0xff7297ff, "/rail"),
         ],

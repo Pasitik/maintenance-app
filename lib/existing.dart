@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maintenance/Pages/accidents.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -8,9 +9,15 @@ import 'package:rxdart/rxdart.dart';
 import 'dart:async';
 import 'package:location/location.dart';
 import 'package:flutter/services.dart';
-import 'robbery_page.dart';
+import 'package:maintenance/Pages/robbery_page.dart';
+import 'package:maintenance/Pages/traffic_page.dart';
+import 'package:maintenance/Pages/streetLights_page.dart';
+import 'package:maintenance/Pages/breakdown_page.dart';
+import 'package:maintenance/Pages/potholes_page.dart';
+import 'package:maintenance/Pages/roadblock_page.dart';
 import 'stuff.dart';
 import 'fun.dart';
+
 
 class Existing extends StatefulWidget {
   @override
@@ -79,38 +86,54 @@ class ExistingState extends State<Existing> {
           ),
           InkWell(
               child: MyItems(
-                   "Robbery", 0xffed622b, "/health"),
+                   "Accidents", 0xffed622b, "/health"),
             onTap: () {
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RobberyCasesPage()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AccidentsPage()));
             }
           ),
           InkWell(
               child: MyItems(
-                  "Robbery", 0xffed622b, "/health"),
+                  "Traffic lights", 0xffed622b, "/health"),
             onTap: () {
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RobberyCasesPage()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => TrafficPage()));
             }
+          ),
+          InkWell(
+              child: MyItems(
+                  "Street Lights", 0xffed622b, "/health"),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => StreetLightPage()));
+              }
           ),
           InkWell(
               child: MyItems(
                    "Car breakdown", 0xffed622b, "/health"),
             onTap: () {
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RobberyCasesPage()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => BreakdownPage()));
             }
           ),
           InkWell(
               child: MyItems(
-                   "Robbery", 0xffed622b, "/health"),
+                   "Potholes", 0xffed622b, "/health"),
             onTap: () {
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RobberyCasesPage()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => PotholesPage()));
             }
+          ),
+          InkWell(
+              child: MyItems(
+                  "Road blockage", 0xffed622b, "/health"),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => RoadblockPage()));
+              }
           ),
         ],
         staggeredTiles: [
           StaggeredTile.extent(1, 120),
           StaggeredTile.extent(1, 120),
           StaggeredTile.extent(1, 120),
-          StaggeredTile.extent(1, 150),
+          StaggeredTile.extent(1, 120),
+          StaggeredTile.extent(1, 120),
+          StaggeredTile.extent(1, 120),
           StaggeredTile.extent(1, 120),
         ],
         ),

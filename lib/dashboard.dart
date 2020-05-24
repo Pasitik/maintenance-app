@@ -163,20 +163,20 @@ class _DashboardState extends State<Dashboard> {
 
               }),
           InkWell(
-            child: MyItems(Icons.healing, "Blockage", 0xff622f74, "/san"),
+            child: MyItems(Icons.healing, "Car Breakdown", 0xff622f74, "/san"),
             onTap: () {
               Future<DocumentReference> addGeoPoint() async{
                 var pos = await location.getLocation();
                 GeoFirePoint point= geo.point(latitude: pos.latitude, longitude: pos.longitude);
-                return databaseReference.collection("Robbery").add({
-                  "info":'there is a roberry taking place',
+                return databaseReference.collection("Car_breakdown").add({
+                  "info":'Car breakdown, we need a toling service or mechanic',
                   "location":point.data,
 
                 });
               }
               addGeoPoint();
 
-              print("Blockage");
+             // print("Blockage");
             },
           ),
 
