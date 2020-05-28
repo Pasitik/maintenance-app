@@ -114,12 +114,7 @@ class FireMapState extends State<FireMap> {
                   forShow['loc']['long'],
                   _modeOfTransport);
             }
-
-            await n.startNav(() {
-              // setState(() {
-              //   _isLoading = false;
-              // });
-            });
+            await n.startNav();
           },
         ),
         body: new GoogleMap(

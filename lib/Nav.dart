@@ -27,14 +27,14 @@ class Nav {
     }, );
   }
 
-  Future<void> startNav( Function a) async {
+  Future<void> startNav( ) async {
 
     navSetup();
     final start = Location(
         name: "Source", latitude: this._startLat, longitude: this._startLong);
     final end = Location(
         name: "Destination", latitude: this._endLat, longitude: this._endLong);
-    a();
+    
     await _directions.startNavigation(
         origin: start,
         destination: end,

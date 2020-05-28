@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:location/location.dart';
+import 'package:maintenance/Nav.dart';
 import 'package:maintenance/map.dart';
 import 'package:maintenance/existing.dart';
+import 'package:maintenance/userLocation.dart';
 
 class AccidentsPage extends StatefulWidget {
   @override
@@ -32,9 +35,12 @@ class _AccidentsPageState extends State<AccidentsPage> {
                   title: Text(document['info']),
                   subtitle: Text(document['info']),
                   trailing: Icon(Icons.my_location),
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => FireMap()));
+                  onTap: () async {
+                    GeoPoint destloc = document.data['location']['geopoint'];
+                    LocationData loc = await getUserLoc();
+                    Nav n = new Nav(loc.latitude,loc.longitude, destloc.latitude, destloc.longitude, "walking");
+                    n.navSetup();
+                    n.startNav();
                   },
                 ));
               }).toList(),
