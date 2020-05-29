@@ -4,6 +4,9 @@ import 'package:maintenance/map.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'dart:async';
 import 'package:rxdart/rxdart.dart';
+import 'package:maintenance/userLocation.dart';
+import 'package:maintenance/Nav.dart';
+import 'package:location/location.dart';
 
 
 
@@ -42,6 +45,9 @@ class _RobberyCasesPageState extends State<RobberyCasesPage> {
           center: center, radius: radius, field: 'info', strictMode: true);
 
   }
+
+  var query=Firestore.instance.collection('Robbery');
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -49,8 +55,8 @@ class _RobberyCasesPageState extends State<RobberyCasesPage> {
       ),
           body: StreamBuilder(
               //stream: Firestore.instance.collection('Robbery').snapshots(),
-            stream: stream,
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            stream: query.snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (!snapshot.hasData) return Center(
             child: CircularProgressIndicator(),
           );
@@ -61,11 +67,12 @@ class _RobberyCasesPageState extends State<RobberyCasesPage> {
                   title: Text(document['info']),
                   subtitle: Text(document['info']),
                   trailing: Icon(Icons.my_location),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder:  (context) => FireMap())
-                    );
+                  onTap: () async {
+                    GeoPoint destloc = document.data['location']['geopoint'];
+                    LocationData loc = await getUserLoc();
+                    Nav n = new Nav(loc.latitude,loc.longitude, destloc.latitude, destloc.longitude, "walking");
+                    n.navSetup();
+                    n.startNav();
                   },
                 )
               );
