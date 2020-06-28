@@ -28,6 +28,7 @@ class _DashboardState extends State<Dashboard> {
 
   // Subscription
   StreamSubscription subscription;
+  var Timestamp = DateTime.now().toUtc().millisecondsSinceEpoch;
 
   Material MyItems(IconData icon, String heading, int color, String page) {
     return Material(
@@ -79,13 +80,7 @@ class _DashboardState extends State<Dashboard> {
 
   LocationData currentLocation;
 
-
-
-
   //submit location to db
-
-
-
 
   final databaseReference = Firestore.instance;
 
@@ -117,66 +112,71 @@ class _DashboardState extends State<Dashboard> {
           InkWell(
             child: MyItems(Icons.directions_bus, "Roads", 0xff26cb3c, "/roads"),
             onTap: () {
-              Future<DocumentReference> addGeoPoint() async{
+              Future<DocumentReference> addGeoPoint() async {
                 var pos = await location.getLocation();
-                GeoFirePoint point= geo.point(latitude: pos.latitude, longitude: pos.longitude);
+                GeoFirePoint point =
+                    geo.point(latitude: pos.latitude, longitude: pos.longitude);
                 return databaseReference.collection("Robbery").add({
-                  "info":'there is a roberry taking place',
-                  "location":point.data,
-
+                  "info": 'there is a roberry taking place',
+                  "location": point.data,
+                  "timestamp": Timestamp
                 });
               }
+
               addGeoPoint();
-
-
             },
           ),
           InkWell(
             child: MyItems(Icons.book, "Accident", 0xffff3266, "/edu"),
             onTap: () {
-              Future<DocumentReference> addGeoPoint() async{
+              print(Timestamp);
+              Future<DocumentReference> addGeoPoint() async {
                 var pos = await location.getLocation();
-                GeoFirePoint point= geo.point(latitude: pos.latitude, longitude: pos.longitude);
+                GeoFirePoint point =
+                    geo.point(latitude: pos.latitude, longitude: pos.longitude);
                 return databaseReference.collection("Accidents").add({
-                  "info":'An accident just occured',
-                  "location":point.data,
-
+                  "info": 'An accident just occured',
+                  "location": point.data,
+                  "timestamp": Timestamp
                 });
               }
-              addGeoPoint();
 
+              addGeoPoint();
             },
           ),
           InkWell(
               child: MyItems(Icons.cloud, "Robbery", 0xfff4c83f, "/sec"),
               onTap: () {
-                Future<DocumentReference> addGeoPoint() async{
+                Future<DocumentReference> addGeoPoint() async {
                   var pos = await location.getLocation();
-                  GeoFirePoint point= geo.point(latitude: pos.latitude, longitude: pos.longitude);
+                  GeoFirePoint point = geo.point(
+                      latitude: pos.latitude, longitude: pos.longitude);
                   return databaseReference.collection("Robbery").add({
-                    "info":'there is a roberry taking place',
-                   "location":point.data,
-
+                    "info": 'there is a roberry taking place',
+                    "location": point.data,
+                    "timestamp": Timestamp
                   });
                 }
-                addGeoPoint();
 
+                addGeoPoint();
               }),
           InkWell(
             child: MyItems(Icons.healing, "Car Breakdown", 0xff622f74, "/san"),
             onTap: () {
-              Future<DocumentReference> addGeoPoint() async{
+              Future<DocumentReference> addGeoPoint() async {
                 var pos = await location.getLocation();
-                GeoFirePoint point= geo.point(latitude: pos.latitude, longitude: pos.longitude);
+                GeoFirePoint point =
+                    geo.point(latitude: pos.latitude, longitude: pos.longitude);
                 return databaseReference.collection("Car_breakdown").add({
-                  "info":'Car breakdown, we need a toling service or mechanic',
-                  "location":point.data,
-
+                  "info": 'Car breakdown, we need a toling service or mechanic',
+                  "location": point.data,
+                  "timestamp": Timestamp
                 });
               }
+
               addGeoPoint();
 
-             // print("Blockage");
+              // print("Blockage");
             },
           ),
 

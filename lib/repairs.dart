@@ -104,7 +104,7 @@ class _RepairsState extends State<Repairs> {
 
   //submit location to db
 
-
+  var Timestamp=DateTime.now().toUtc().millisecondsSinceEpoch;
 
 
   final databaseReference = Firestore.instance;
@@ -134,6 +134,7 @@ class _RepairsState extends State<Repairs> {
                   return databaseReference.collection("Traffic").add({
                     "info":'Faulty traffic lights',
                     "location":point.data,
+                    "timestamp": Timestamp
 
                   });
                 }
@@ -150,6 +151,7 @@ class _RepairsState extends State<Repairs> {
                   return databaseReference.collection("Street_lights").add({
                     "info":'Faulty Steet lights',
                     "location":point.data,
+                    "timestamp": Timestamp
 
                   });
                 }
@@ -165,8 +167,10 @@ class _RepairsState extends State<Repairs> {
                   return databaseReference.collection("Potholes").add({
                     "info":'Potholes',
                     "location":point.data,
+                    "timestamp": Timestamp
 
                   });
+
                 }
                 addGeoPoint();
 
@@ -180,6 +184,7 @@ class _RepairsState extends State<Repairs> {
                   return databaseReference.collection("Blockage").add({
                     "info":'There is something blocking this road',
                     "location":point.data,
+                    "timestamp": Timestamp
 
                   });
                 }

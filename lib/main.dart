@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dashboard.dart';
 import 'existing.dart';
+import 'solved.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 //import 'package:dashboard/edu.dart';
 //import 'package:dashboard/health.dart';
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
               children: [
                 Dashboard(),
                 Existing(),
-                Icon(Icons.directions_bike),
+                Solved(),
               ],
             ),
           ),
